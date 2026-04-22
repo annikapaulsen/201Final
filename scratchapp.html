@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fleetwood Mac — Mini App</title>
+    <title>Fleetwood Mac — The Master Quiz</title>
     <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -16,6 +16,8 @@
     --plum:       #4a2460;
     --rose:       #c2697a;
     --border:     #d4b8a0;
+    --correct:    #6b8e23;
+    --wrong:      #a52a2a;
   }
 
   * { box-sizing: border-box; }
@@ -42,7 +44,6 @@
     box-shadow: 0 1px 8px rgba(74, 36, 96, 0.07);
   }
 
-  /* top accent stripe */
   .panel::after {
     content: '';
     position: absolute;
@@ -52,7 +53,6 @@
     background: linear-gradient(90deg, var(--rose) 0%, var(--accent) 50%, #7a4a9a 100%);
   }
 
-  /* ruled texture */
   .panel::before {
     content: '';
     position: absolute;
@@ -77,103 +77,188 @@
     letter-spacing: 0.01em;
   }
 
-  .sub {
-    margin: 0 0 1rem;
-    font-size: 0.9rem;
-    font-style: italic;
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-family: "Libre Baskerville", serif;
     color: var(--muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .out {
+    margin-bottom: 1.5rem;
+    min-height: 6.5rem;
+    padding: 1.2rem;
+    background: #f0e4d0;
+    border-radius: 3px;
+    border-left: 3px solid var(--rose);
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   button {
     width: 100%;
     padding: 0.65rem 1rem;
-    font-size: 0.9rem;
-    font-family: "Libre Baskerville", serif;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border: 1px solid var(--rose);
-    border-radius: 3px;
-    cursor: pointer;
-    background: transparent;
-    color: var(--plum);
-    transition: background 0.2s, color 0.2s;
-  }
-
-  button:hover {
-    background: var(--rose);
-    color: #faf3e8;
-  }
-
-  button:active { transform: translateY(1px); }
-
-  .out {
-    margin-top: 1rem;
-    min-height: 4.5rem;
-    padding: 0.85rem 1rem;
-    background: #f0e4d0;
-    border-radius: 3px;
-    border-left: 3px solid var(--rose);
-    font-size: 1rem;
-    font-style: italic;
-    line-height: 1.55;
-    color: var(--text);
-  }
-
-  .cite {
-    display: block;
-    margin-top: 0.5rem;
     font-size: 0.8rem;
     font-family: "Libre Baskerville", serif;
-    color: var(--muted);
+    font-weight: 700;
     letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    background: #fffcf7;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  button:hover:not(:disabled) {
+    border-color: var(--rose);
+    color: var(--plum);
+    background: var(--card);
+  }
+
+  button.correct { background: var(--correct) !important; color: white !important; border-color: var(--correct); }
+  button.wrong { background: var(--wrong) !important; color: white !important; border-color: var(--wrong); }
+
+  #next-btn {
+    margin-top: 1.5rem;
+    border: 1px solid var(--plum);
+    background: var(--plum);
+    color: white;
+    display: none;
   }
 
   .back {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     text-align: center;
     font-style: italic;
+    font-size: 0.9rem;
   }
 
-  .back a {
-    color: var(--plum);
-    text-decoration: none;
-  }
-
-  .back a:hover {
-    color: var(--rose);
-  }
+  .back a { color: var(--plum); text-decoration: none; }
 </style>
 </head>
 <body>
     <div class="panel">
-        <h1>Rumours-era line</h1>
-        <p class="sub">Click for a random line from well-known Fleetwood Mac.</p>
-        <button type="button" id="go">Give me a line</button>
-        <div class="out" id="out" aria-live="polite">Press the button.</div>
-        <p class="cite" id="cite"></p>
+        <h1>Guess That Song</h1>
+        
+        <div class="status-bar">
+            <span>Points: <span id="score">0</span></span>
+            <span>Song <span id="round">1</span></span>
+        </div>
+
+        <div class="out" id="question-text">
+            Ready for the first line?
+        </div>
+
+        <div class="options-container" id="options"></div>
+
+        <button id="next-btn">Keep Playing</button>
+
         <div class="back">
             <a href="fromScratch.html">← Back to scratch page</a>
         </div>
     </div>
+
     <script>
-        const lines = [
-            { text: "You can go your own way — call it independence, call it goodbye energy.", song: "Go Your Own Way" },
-            { text: "Thunder only happens when it’s raining — moody weather, moodier feelings.", song: "Dreams" },
-            { text: "Tell me lies, sweet little lies — the catchiest way to talk about uncertainty.", song: "Little Lies" },
-            { text: "Rock on, gold dust woman — dark glamour and a little bit of edge.", song: "Gold Dust Woman" },
-            { text: "I don’t want to know — sometimes the chorus is a whole thesis statement.", song: "I Don’t Want to Know" },
-            { text: "Loving you isn’t the right thing to do — drama, guitars, and a very clear premise.", song: "The Chain (opening vibes)" },
-            { text: "Rhiannon rings like a bell through the night — mystical, melodic, instantly recognizable.", song: "Rhiannon" },
-            { text: "Sara, you're the poet in my heart — big feelings, big arrangement energy.", song: "Sara" }
+        const library = [
+            /* Original & Harder Set */
+            { q: "Listen to the wind blow, down comes the night...", a: "The Chain", choices: ["The Chain", "Gold Dust Woman", "Go Your Own Way", "Tusk"] },
+            { q: "Now here you go again, you say you want your freedom...", a: "Dreams", choices: ["Dreams", "Silver Springs", "Seven Wonders", "Everywhere"] },
+            { q: "So I'm back to the velvet underground, back to the floor...", a: "Gypsy", choices: ["Gypsy", "Rhiannon", "Angel", "Storms"] },
+            { q: "And the moon is high, and the night is young...", a: "Sisters of the Moon", choices: ["Sisters of the Moon", "Rhiannon", "Hypnotized", "Fireflies"] },
+            { q: "Time cast a spell on you, but you won't forget me...", a: "Silver Springs", choices: ["Silver Springs", "Dreams", "Storms", "Sara"] },
+            { q: "Drowning in the sea of love, where everyone would love to drown...", a: "Sara", choices: ["Sara", "Storms", "Beautiful Child", "Sisters of the Moon"] },
+            { q: "Don't say that you love me, just tell me that you want me...", a: "Tusk", choices: ["Tusk", "Big Love", "The Chain", "Not That Funny"] },
+            { q: "I know I'm out of luck, but I've got to find out if it's you...", a: "Big Love", choices: ["Big Love", "Little Lies", "Family Man", "Tango in the Night"] },
+            { q: "It's not a hallucination, all that you see is even more than it seems...", a: "Hypnotized", choices: ["Hypnotized", "Sentimental Lady", "Mystery to Me", "Future Games"] },
+            { q: "I have no fear, I have only love...", a: "Storms", choices: ["Storms", "Sara", "Landslide", "Wild Heart"] },
+            
+            /* 10 New Songs & Deep Cuts */
+            { q: "You can be my silver spring, blue-green colors flashing...", a: "Silver Springs", choices: ["Silver Springs", "Gold Dust Woman", "Dreams", "Seven Wonders"] },
+            { q: "You are the same as me, I am as you...", a: "Sentimental Lady", choices: ["Sentimental Lady", "Hypnotized", "Songbird", "Blue Letter"] },
+            { q: "She is like a cat in the dark, and then she is the darkness...", a: "Rhiannon", choices: ["Rhiannon", "Sisters of the Moon", "Gold Dust Woman", "Angel"] },
+            { q: "I'm not the girl I used to be, I've got a new house and a new family...", a: "Straight Back", choices: ["Straight Back", "Gypsy", "Hold Me", "Think About Me"] },
+            { q: "Can you hear me calling your name? You know that I'm falling...", a: "Everywhere", choices: ["Everywhere", "Little Lies", "Seven Wonders", "Say You Love Me"] },
+            { q: "But I'm not that funny, I'm just a little bit of a clown...", a: "Not That Funny", choices: ["Not That Funny", "Tusk", "Think About Me", "The Ledge"] },
+            { q: "Someone should have told me that the sun was going down...", a: "Save Me A Place", choices: ["Save Me A Place", "Storms", "Landslide", "Beautiful Child"] },
+            { q: "I've been thinking about you, and I hope you're thinking about me...", a: "Think About Me", choices: ["Think About Me", "Don't Stop", "Go Your Own Way", "Second Hand News"] },
+            { q: "I'm over my head, but it sure feels like I'm spinning in the wind...", a: "Over My Head", choices: ["Over My Head", "Say You Love Me", "Rhiannon", "Blue Letter"] },
+            { q: "She's a little bit of magic, she's a little bit of light...", a: "Seven Wonders", choices: ["Seven Wonders", "Gypsy", "Everywhere", "Angel"] },
+            { q: "Maybe you think that I'm being foolish, I don't care...", a: "Blue Letter", choices: ["Blue Letter", "Crystal", "Monday Morning", "World Turning"] },
+            { q: "I know you're somewhere, and I'm gonna find you...", a: "Oh Diane", choices: ["Oh Diane", "Little Lies", "Big Love", "Hold Me"] },
+            { q: "When I see you again, will it be the same?", a: "When I See You Again", choices: ["When I See You Again", "Sara", "Storms", "Silver Springs"] },
+            { q: "I can't wait for the sun to go down...", a: "Monday Morning", choices: ["Monday Morning", "Don't Stop", "Blue Letter", "Go Your Own Way"] }
         ];
-        const out = document.getElementById("out");
-        const cite = document.getElementById("cite");
-        document.getElementById("go").onclick = () => {
-            const pick = lines[Math.floor(Math.random() * lines.length)];
-            out.textContent = pick.text;
-            cite.textContent = "— inspired by: " + pick.song;
+
+        let score = 0;
+        let round = 1;
+        let pool = [...library];
+
+        const questionEl = document.getElementById("question-text");
+        const optionsEl = document.getElementById("options");
+        const scoreEl = document.getElementById("score");
+        const roundEl = document.getElementById("round");
+        const nextBtn = document.getElementById("next-btn");
+
+        function startRound() {
+            if (pool.length === 0) pool = [...library]; // Refresh pool if all answered
+            
+            nextBtn.style.display = "none";
+            optionsEl.innerHTML = "";
+            
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            const currentQ = pool.splice(randomIndex, 1)[0];
+            
+            questionEl.textContent = `"${currentQ.q}"`;
+
+            const shuffledChoices = [...currentQ.choices].sort(() => Math.random() - 0.5);
+            
+            shuffledChoices.forEach(choice => {
+                const btn = document.createElement("button");
+                btn.textContent = choice;
+                btn.onclick = () => {
+                    const allBtns = optionsEl.querySelectorAll("button");
+                    allBtns.forEach(b => b.disabled = true);
+
+                    if (choice === currentQ.a) {
+                        btn.classList.add("correct");
+                        score++;
+                        scoreEl.textContent = score;
+                    } else {
+                        btn.classList.add("wrong");
+                        allBtns.forEach(b => {
+                            if (b.textContent === currentQ.a) b.classList.add("correct");
+                        });
+                    }
+                    nextBtn.style.display = "block";
+                };
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        nextBtn.onclick = () => {
+            round++;
+            roundEl.textContent = round;
+            startRound();
         };
+
+        startRound();
     </script>
 </body>
 </html>

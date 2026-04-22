@@ -1,22 +1,28 @@
-/* -------- VERY LIGHT POLISH ONLY -------- */
 
-/* Improve readability slightly */
 p {
   line-height: 1.7;
 }
 
-/* Slightly smoother spacing */
 section {
   margin-bottom: 2rem;
 }
 
-/* Clean up list spacing in resume */
 li {
   margin-bottom: 0.3rem;
 }
 
-/* Subtle navbar hover (no color change) */
-#mainNav .nav-link:hover {
-  opacity: 0.75;
+.page-header h1,
+.page-header p {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
+h2 {
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+.index-section h2 {
+  font-weight: 400;
+}
+.post-subtitle {
+  font-weight: 700;
+}
