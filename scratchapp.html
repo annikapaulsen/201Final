@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleetwood Mac — Mini App</title>
+    <style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+  :root {
+    --bg:         #f5ede0;
+    --card:       #faf3e8;
+    --text:       #3a2416;
+    --accent:     #c4a35a;
+    --muted:      #7a5840;
+    --plum:       #4a2460;
+    --rose:       #c2697a;
+    --border:     #d4b8a0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "IM Fell English", "Georgia", serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .panel {
+    width: min(100%, 26rem);
+    background: var(--card);
+    border-radius: 5px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    position: relative;
+    box-shadow: 0 1px 8px rgba(74, 36, 96, 0.07);
+  }
+
+  /* top accent stripe */
+  .panel::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 5px 5px 0 0;
+    background: linear-gradient(90deg, var(--rose) 0%, var(--accent) 50%, #7a4a9a 100%);
+  }
+
+  /* ruled texture */
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 22px,
+      rgba(194, 105, 122, 0.05) 22px,
+      rgba(194, 105, 122, 0.05) 23px
+    );
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    margin: 0 0 0.35rem;
+    color: var(--plum);
+    letter-spacing: 0.01em;
+  }
+
+  .sub {
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  button {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    font-family: "Libre Baskerville", serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--rose);
+    border-radius: 3px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--plum);
+    transition: background 0.2s, color 0.2s;
+  }
+
+  button:hover {
+    background: var(--rose);
+    color: #faf3e8;
+  }
+
+  button:active { transform: translateY(1px); }
+
+  .out {
+    margin-top: 1rem;
+    min-height: 4.5rem;
+    padding: 0.85rem 1rem;
+    background: #f0e4d0;
+    border-radius: 3px;
+    border-left: 3px solid var(--rose);
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .cite {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-family: "Libre Baskerville", serif;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .back {
+    margin-top: 1.25rem;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .back a {
+    color: var(--plum);
+    text-decoration: none;
+  }
+
+  .back a:hover {
+    color: var(--rose);
+  }
+</style>
+</head>
+<body>
+    <div class="panel">
+        <h1>Rumours-era line</h1>
+        <p class="sub">Click for a random line from well-known Fleetwood Mac.</p>
+        <button type="button" id="go">Give me a line</button>
+        <div class="out" id="out" aria-live="polite">Press the button.</div>
+        <p class="cite" id="cite"></p>
+        <div class="back">
+            <a href="fromScratch.html">← Back to scratch page</a>
+        </div>
+    </div>
+    <script>
+        const lines = [
+            { text: "You can go your own way — call it independence, call it goodbye energy.", song: "Go Your Own Way" },
+            { text: "Thunder only happens when it’s raining — moody weather, moodier feelings.", song: "Dreams" },
+            { text: "Tell me lies, sweet little lies — the catchiest way to talk about uncertainty.", song: "Little Lies" },
+            { text: "Rock on, gold dust woman — dark glamour and a little bit of edge.", song: "Gold Dust Woman" },
+            { text: "I don’t want to know — sometimes the chorus is a whole thesis statement.", song: "I Don’t Want to Know" },
+            { text: "Loving you isn’t the right thing to do — drama, guitars, and a very clear premise.", song: "The Chain (opening vibes)" },
+            { text: "Rhiannon rings like a bell through the night — mystical, melodic, instantly recognizable.", song: "Rhiannon" },
+            { text: "Sara, you're the poet in my heart — big feelings, big arrangement energy.", song: "Sara" }
+        ];
+        const out = document.getElementById("out");
+        const cite = document.getElementById("cite");
+        document.getElementById("go").onclick = () => {
+            const pick = lines[Math.floor(Math.random() * lines.length)];
+            out.textContent = pick.text;
+            cite.textContent = "— inspired by: " + pick.song;
+        };
+    </script>
+</body>
+</html>

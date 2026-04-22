@@ -1,0 +1,22 @@
+/* -------- VERY LIGHT POLISH ONLY -------- */
+
+/* Improve readability slightly */
+p {
+  line-height: 1.7;
+}
+
+/* Slightly smoother spacing */
+section {
+  margin-bottom: 2rem;
+}
+
+/* Clean up list spacing in resume */
+li {
+  margin-bottom: 0.3rem;
+}
+
+/* Subtle navbar hover (no color change) */
+#mainNav .nav-link:hover {
+  opacity: 0.75;
+}
+
